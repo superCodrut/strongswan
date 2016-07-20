@@ -358,6 +358,14 @@ struct bus_t {
 					 chunk_t dh_other, chunk_t nonce_i, chunk_t nonce_r,
 					 ike_sa_t *rekey, shared_key_t *shared);
 
+        /**
+         * Secret keys hook.
+         *
+         * @param ike_sa        IKE_SA this keymat belongs to
+         */
+        void (*ike_keys)(bus_t *this, ike_sa_t *ike_sa,
+					chunk_t key);
+
 	/**
 	 * CHILD_SA keymat hook.
 	 *
