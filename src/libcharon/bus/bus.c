@@ -609,7 +609,7 @@ METHOD(bus_t, save_ike_keys, void,
 			continue;
 		}
 		entry->calling++;
-		keep = entry->listener->save_ike_keys(entry->listener, key);
+		keep = entry->listener->save_ike_keys(entry->listener, ike_sa, key);
 		entry->calling--;
 		if (!keep)
 		{

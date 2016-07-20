@@ -100,7 +100,7 @@ struct listener_t {
          * @param ike_sa        IKE_SA this keymat belongs to
          * @param key           SK_ei, SK_er, SK_ai or SK_ar
          */
-        void (*save_ike_keys)(bus_t *this, ike_sa_t *ike_sa,
+	bool (*save_ike_keys)(listener_t *this, ike_sa_t *ike_sa,
                                         chunk_t key);
 
 	/**
