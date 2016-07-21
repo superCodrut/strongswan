@@ -249,6 +249,7 @@ static bool derive_ike_traditional(private_keymat_v2_t *this, uint16_t enc_alg,
 	{
 		goto failure;
 	}
+	charon->bus->save_ike_keys(charon->bus, key);
 	DBG4(DBG_IKE, "Sk_ei secret %B", &key);
 	if (!crypter_i->set_key(crypter_i, key))
 	{

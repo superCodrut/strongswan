@@ -361,11 +361,9 @@ struct bus_t {
         /**
          * Save Secret IKE_SA keys hook.
          *
-         * @param ike_sa        IKE_SA this keymat belongs to
          * @param key           SK_ei, SK_er, SK_ai or SK_ar
          */
-        void (*save_ike_keys)(bus_t *this, ike_sa_t *ike_sa,
-					chunk_t key);
+        void (*save_ike_keys)(bus_t *this, chunk_t key);
 
 	/**
 	 * CHILD_SA keymat hook.
