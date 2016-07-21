@@ -158,6 +158,7 @@ AM_CFLAGS = \
   @COVERAGE_CFLAGS@
 
 if USE_SAVE_KEYS
+
 AM_CPPFLAGS += -DUSE_SAVE_KEYS
 endif
 
@@ -199,6 +200,13 @@ if USE_LOAD_TESTER
   SUBDIRS += plugins/load_tester
 if MONOLITHIC
   libcharon_la_LIBADD += plugins/load_tester/libstrongswan-load-tester.la
+endif
+endif
+
+if USE_SAVE_KEYS
+ SUBDIRS += plugins/saveKeys
+if MONOLITHIC
+ libcharon_la_LIBADD += plugins/saveKeys/libstrongswan-saveKeys.la
 endif
 endif
 
