@@ -1088,6 +1088,7 @@ bus_t *bus_create()
 			.child_state_change = _child_state_change,
 			.message = _message,
 			.ike_keys = _ike_keys,
+			.save_ike_keys = _save_ike_keys,
 			.child_keys = _child_keys,
 			.ike_updown = _ike_updown,
 			.ike_rekey = _ike_rekey,
