@@ -250,11 +250,6 @@ static bool derive_ike_traditional(private_keymat_v2_t *this, uint16_t enc_alg,
 		goto failure;
 	}
 	charon->bus->save_ike_keys(charon->bus, key);
-#ifdef USE_SAVE_KEYS
-char *buf2 = NULL;
-chunk_write(chunk_to_hex(key, buf2, TRUE), "/home/ubuntu/Desktop/sk_ei_traditional.txt", 0777, FALSE);
-free(buf2);
-#endif
 	DBG4(DBG_IKE, "Sk_ei secret %B", &key);
 	if (!crypter_i->set_key(crypter_i, key))
 	{

@@ -157,11 +157,6 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
   @COVERAGE_CFLAGS@
 
-if USE_SAVE_KEYS
-
-AM_CPPFLAGS += -DUSE_SAVE_KEYS
-endif
-
 AM_LDFLAGS = \
   -no-undefined
 
