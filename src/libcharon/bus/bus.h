@@ -361,9 +361,12 @@ struct bus_t {
         /**
          * Save Secret IKE_SA keys hook.
          *
+         * @param aead          TRUE only if aead is used
+         * @param ike_version   IKEV1 for IKEv1, IKEV2 for IKEv2
          * @param key           SK_ei, SK_er, SK_ai or SK_ar
          */
-        void (*save_ike_keys)(bus_t *this, chunk_t key);
+        void (*save_ike_keys)(bus_t *this, ike_version_t ike_version, bool aead,
+                                         chunk_t key);
 
 	/**
 	 * CHILD_SA keymat hook.

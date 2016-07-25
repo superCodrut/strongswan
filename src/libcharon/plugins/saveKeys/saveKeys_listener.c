@@ -40,13 +40,17 @@ struct private_saveKeys_listener_t {
 };
 
 METHOD(listener_t, save_ike_keys, bool,
-	private_saveKeys_listener_t *this, chunk_t key)
+        private_saveKeys_listener_t *this, ike_version_t ike_version, bool aead,
+        chunk_t key)
 {
-	char *buf2 = NULL;
-	chunk_write(chunk_to_hex(key, buf2, TRUE), "/home/ubuntu/Desktop/plugin_test.txt", 0777, FALSE);
-	free(buf2);
-	return TRUE;
+        if ( ike_version == IKEV2 ) {
+                char *buf2 = NULL;
+                chunk_write(chunk_to_hex(key, buf2, TRUE), "/home/ubuntu/Desktop/plugin_test.txt", 0777, FALSE);
+                free(buf2);
+        }
+        return TRUE;
 }
+
 
 /**
  * See header.

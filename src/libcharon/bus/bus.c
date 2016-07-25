@@ -594,30 +594,31 @@ METHOD(bus_t, ike_keys, void,
 }
 
 METHOD(bus_t, save_ike_keys, void,
-	private_bus_t *this, chunk_t key)
+        private_bus_t *this, ike_version_t ike_version, bool aead,
+        chunk_t key)
 {
-	enumerator_t *enumerator;
-	entry_t *entry;
-	bool keep;
+        enumerator_t *enumerator;
+        entry_t *entry;
+        bool keep;
 
-	this->mutex->lock(this->mutex);
-	enumerator = this->listeners->create_enumerator(this->listeners);
-	while (enumerator->enumerate(enumerator, &entry))
-	{
-		if (entry->calling || !entry->listener->save_ike_keys)
-		{
-			continue;
-		}
-		entry->calling++;
-		keep = entry->listener->save_ike_keys(entry->listener, key);
-		entry->calling--;
-		if (!keep)
-		{
-			unregister_listener(this, entry, enumerator);
-		}
-	}
-	enumerator->destroy(enumerator);
-	this->mutex->unlock(this->mutex);
+        this->mutex->lock(this->mutex);
+        enumerator = this->listeners->create_enumerator(this->listeners);
+        while (enumerator->enumerate(enumerator, &entry))
+        {
+                if (entry->calling || !entry->listener->save_ike_keys)
+                {
+                        continue;
+                }
+                entry->calling++;
+                keep = entry->listener->save_ike_keys(entry->listener, ike_version, aead, key);
+                entry->calling--;
+                if (!keep)
+                {
+                        unregister_listener(this, entry, enumerator);
+                }
+        }
+        enumerator->destroy(enumerator);
+        this->mutex->unlock(this->mutex);
 }
 
 METHOD(bus_t, child_keys, void,
