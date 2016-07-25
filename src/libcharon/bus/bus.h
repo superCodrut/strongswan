@@ -358,12 +358,23 @@ struct bus_t {
 					 chunk_t dh_other, chunk_t nonce_i, chunk_t nonce_r,
 					 ike_sa_t *rekey, shared_key_t *shared);
 
-        /**
-         * Save Secret IKE_SA keys hook.
-         *
-         * @param key           SK_ei, SK_er, SK_ai or SK_ar
-         */
-        void (*save_ike_keys)(bus_t *this, chunk_t key);
+	/**
+	 * Save Secret IKE_SA keys hook.
+	 *
+	 * @param ike_version   IKEV1 for IKEv1, IKEV2 for IKEv2
+	 * @param aead          TRUE only if aead is used
+	 * @param sk_ei		SK_ei
+	 * @param sk_er		SK_er
+	 * @param sk_ai		chunk_empty for aead
+	 * @param sk_ar		chunk_empty for aead
+	 * @param enc_alg	Encryption algorithm
+	 * @param key_size	Key size for encryption algorithm
+	 * @param int_alg	Integrity algorithm
+	 */
+	void (*save_ike_keys)(bus_t *this, ike_version_t ike_version, bool aead,
+					chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai,
+					chunk_t sk_ar, uint16_t enc_alg, uint16_t key_size,
+					uint16_t int_alg);
 
 	/**
 	 * CHILD_SA keymat hook.
