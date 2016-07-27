@@ -623,6 +623,33 @@ METHOD(bus_t, save_ike_keys, void,
 	this->mutex->unlock(this->mutex);
 }
 
+METHOD(bus_t, send_spis, void,
+	private_bus_t *this, chunk_t spi_i, chunk_t spi_r)
+{
+	enumerator_t *enumerator;
+	entry_t *entry;
+	bool keep;
+
+	this->mutex->lock(this->mutex);
+	enumerator = this->listeners->create_enumerator(this->listeners);
+	while (enumerator->enumerate(enumerator, &entry))
+	{
+		if (entry->calling || !entry->listener->send_spis)
+		{
+			continue;
+		}
+		entry->calling++;
+		keep = entry->listener->send_spis(entry->listener, spi_i, spi_r);
+		entry->calling--;
+		if (!keep)
+		{
+			unregister_listener(this, entry, enumerator);
+		}
+	}
+	enumerator->destroy(enumerator);
+	this->mutex->unlock(this->mutex);
+}
+
 METHOD(bus_t, child_keys, void,
 	private_bus_t *this, child_sa_t *child_sa, bool initiator,
 	diffie_hellman_t *dh, chunk_t nonce_i, chunk_t nonce_r)
@@ -1091,6 +1118,8 @@ bus_t *bus_create()
 			.child_state_change = _child_state_change,
 			.message = _message,
 			.ike_keys = _ike_keys,
+			.save_ike_keys = _save_ike_keys,
+			.send_spis = _send_spis,
 			.child_keys = _child_keys,
 			.ike_updown = _ike_updown,
 			.ike_rekey = _ike_rekey,

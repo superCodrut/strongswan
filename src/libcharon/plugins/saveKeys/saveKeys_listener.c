@@ -37,7 +37,25 @@ struct private_saveKeys_listener_t {
 	 * Public saveKeys_listener_t interface.
 	 */
 	saveKeys_listener_t public;
+
+	/**
+	 * SPI_i for IKEv2.
+	 */
+	chunk_t spi_i;
+
+	/**
+	 * SPI_r for IKEv2.
+	 */
+	chunk_t spi_r;
 };
+
+METHOD(listener_t, send_spis, bool,
+	private_saveKeys_listener_t *this, chunk_t spi_i, chunk_t spi_r)
+{
+	this->spi_i = chunk_clone(spi_i);
+	this->spi_r = chunk_clone(spi_r);
+	return TRUE;
+}
 
 METHOD(listener_t, save_ike_keys, bool,
         private_saveKeys_listener_t *this, ike_version_t ike_version, bool aead,
@@ -58,7 +76,16 @@ METHOD(listener_t, save_ike_keys, bool,
         free(buf2);
 
 
-        enum_name_t *type1 = transform_get_enum_names(ENCRYPTION_ALGORITHM);
+	chunk_write(chunk_to_hex(this->spi_i, buf2, TRUE), "/tmp/spi_i.txt", 0777, FALSE);
+	free(buf2);
+
+	chunk_write(chunk_to_hex(this->spi_r, buf2, TRUE), "/tmp/spi_r.txt", 0777, FALSE);
+	free(buf2);
+
+	chunk_clear(&this->spi_i);
+	chunk_clear(&this->spi_r);
+
+	enum_name_t *type1 = transform_get_enum_names(ENCRYPTION_ALGORITHM);
         enum_name_t *type2 = transform_get_enum_names(INTEGRITY_ALGORITHM);
         char *encc = enum_to_name(type1, enc_alg);
         char *intt = enum_to_name(type2, int_alg);
@@ -85,6 +112,7 @@ saveKeys_listener_t *saveKeys_listener_create()
 		.public = {
 			.listener = {
 				.save_ike_keys = _save_ike_keys,
+				.send_spis = _send_spis,
 			},
 		}
 	);
