@@ -41,13 +41,35 @@ struct private_saveKeys_listener_t {
 
 METHOD(listener_t, save_ike_keys, bool,
         private_saveKeys_listener_t *this, ike_version_t ike_version, bool aead,
-        chunk_t key)
+	chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai, chunk_t sk_ar, uint16_t enc_alg,
+	uint16_t key_size, uint16_t int_alg)
 {
-        if ( ike_version == IKEV2 ) {
-                char *buf2 = NULL;
-                chunk_write(chunk_to_hex(key, buf2, TRUE), "/home/ubuntu/Desktop/plugin_test.txt", 0777, FALSE);
-                free(buf2);
-        }
+        char *buf2 = NULL;
+        chunk_write(chunk_to_hex(sk_ei, buf2, TRUE), "/home/ubuntu/Desktop/sk_ei.txt", 0777, FALSE);
+        free(buf2);
+
+        chunk_write(chunk_to_hex(sk_er, buf2, TRUE), "/home/ubuntu/Desktop/sk_er.txt", 0777, FALSE);
+        free(buf2);
+
+        chunk_write(chunk_to_hex(sk_ai, buf2, TRUE), "/home/ubuntu/Desktop/sk_ai.txt", 0777, FALSE);
+        free(buf2);
+
+        chunk_write(chunk_to_hex(sk_ar, buf2, TRUE), "/home/ubuntu/Desktop/sk_ar.txt", 0777, FALSE);
+        free(buf2);
+
+
+        enum_name_t *type1 = transform_get_enum_names(ENCRYPTION_ALGORITHM);
+        enum_name_t *type2 = transform_get_enum_names(INTEGRITY_ALGORITHM);
+        char *encc = enum_to_name(type1, enc_alg);
+        char *intt = enum_to_name(type2, int_alg);
+        FILE *pr = fopen ("/home/ubuntu/Desktop/alg_enc.txt", "w");
+        fprintf(pr, "%s-%d", encc, key_size);
+        fclose(pr);
+        FILE *pr1 = fopen ("/home/ubuntu/Desktop/alg_int.txt", "w");
+        fprintf(pr1, "%s", intt);
+        fclose(pr1);
+
+
         return TRUE;
 }
 

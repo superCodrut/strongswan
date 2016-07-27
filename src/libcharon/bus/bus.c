@@ -595,7 +595,8 @@ METHOD(bus_t, ike_keys, void,
 
 METHOD(bus_t, save_ike_keys, void,
         private_bus_t *this, ike_version_t ike_version, bool aead,
-        chunk_t key)
+        chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai, chunk_t sk_ar,
+	uint16_t enc_alg, uint16_t key_size, uint16_t int_alg)
 {
         enumerator_t *enumerator;
         entry_t *entry;
@@ -610,7 +611,8 @@ METHOD(bus_t, save_ike_keys, void,
                         continue;
                 }
                 entry->calling++;
-                keep = entry->listener->save_ike_keys(entry->listener, ike_version, aead, key);
+                keep = entry->listener->save_ike_keys(entry->listener, ike_version, aead, sk_ei,
+						sk_er, sk_ai, sk_ar, enc_alg, key_size, int_alg);
                 entry->calling--;
                 if (!keep)
                 {
