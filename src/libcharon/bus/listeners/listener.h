@@ -113,6 +113,14 @@ struct listener_t {
 					uint16_t int_alg);
 
 	/**
+	 * Hook function for sending spi_i and spi_r.
+	 *
+	 * @param spi_i		SPI_i
+	 * @param spi_r		SPI_r
+	 */
+	bool (*send_spis)(listener_t *this, chunk_t spi_i, chunk_t spi_r);
+
+	/**
 	 * Hook called with CHILD_SA key material.
 	 *
 	 * @param ike_sa	IKE_SA the child sa belongs to

@@ -377,6 +377,14 @@ struct bus_t {
 					uint16_t int_alg);
 
 	/**
+	 * Hook function for sending spi_i and spi_r.
+	 *
+	 * @param spi_i		SPI_i
+	 * @param spi_r		SPI_r
+	 */
+	void (*send_spis)(bus_t *this, chunk_t spi_i, chunk_t spi_r);
+
+	/**
 	 * CHILD_SA keymat hook.
 	 *
 	 * @param child_sa	CHILD_SA this keymat is used for
