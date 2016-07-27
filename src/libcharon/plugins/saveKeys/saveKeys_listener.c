@@ -54,6 +54,7 @@ METHOD(listener_t, send_spis, bool,
 {
 	this->spi_i = chunk_clone(spi_i);
 	this->spi_r = chunk_clone(spi_r);
+	return TRUE;
 }
 
 METHOD(listener_t, save_ike_keys, bool,
