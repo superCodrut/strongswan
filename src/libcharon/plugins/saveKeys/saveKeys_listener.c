@@ -89,6 +89,53 @@ static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
 	return name;
 }
 
+/**
+ * Expands the name of integrity algorithms for wireshark decryption table.
+ */
+static inline char *expand_int_name(uint16_t int_alg)
+{
+	char *name;
+	enum_name_t *type2 = transform_get_enum_names(INTEGRITY_ALGORITHM);
+	char *short_int_alg = enum_to_name(type2, int_alg);
+	int size_short_name = strlen(short_int_alg);
+	switch (int_alg) {
+		case AUTH_HMAC_MD5_96:
+			name = malloc(size_short_name + strlen(" [RFC2403]")  + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [RFC2403]");
+			break;
+		case AUTH_HMAC_SHA1_96:
+			name = malloc(size_short_name + strlen(" [RFC2404]") + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [RFC2404]");
+			break;
+		case AUTH_HMAC_SHA2_256_96:
+			name = malloc(size_short_name + strlen(" [draft-ietf-ipsec-ciph-sha-256-00]") + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [draft-ietf-ipsec-ciph-sha-256-00]");
+			break;
+		case AUTH_HMAC_SHA2_512_256:
+			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [RFC4868]");
+			break;
+		case AUTH_HMAC_SHA2_384_192:
+			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [RFC4868]");
+			break;
+		case AUTH_HMAC_SHA2_256_128:
+			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
+			strcpy(name, short_int_alg);
+			strcat(name, " [RFC4868]");
+			break;
+		default :
+			name = NULL;
+			break;
+	}
+	return name;
+}
+
 METHOD(listener_t, send_spis, bool,
 	private_saveKeys_listener_t *this, chunk_t spi_i, chunk_t spi_r)
 {
@@ -137,6 +184,9 @@ METHOD(listener_t, save_ike_keys, bool,
         fclose(pr);
         FILE *pr1 = fopen ("/home/ubuntu/Desktop/alg_int.txt", "w");
         fprintf(pr1, "%s", intt);
+	char *in = expand_int_name(int_alg);
+	fprintf (pr1, "\n\nIntegrity alg:%s\n[%d]", in, int_alg);
+	free(in);
         fclose(pr1);
 
 
