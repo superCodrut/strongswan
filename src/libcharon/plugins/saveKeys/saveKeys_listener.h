@@ -25,6 +25,7 @@
 #define saveKeys_LISTENER_H
 
 #include <bus/listeners/listener.h>
+#include <ctype.h>
 
 typedef struct saveKeys_listener_t saveKeys_listener_t;
 
