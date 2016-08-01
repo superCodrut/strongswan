@@ -163,12 +163,14 @@ METHOD(listener_t, save_ike_keys, bool,
 	chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai, chunk_t sk_ar, uint16_t enc_alg,
 	uint16_t key_size, uint16_t int_alg)
 {
-	char *buffer_sk_ei, *buffer_sk_er, *buffer_sk_ai, *buffer_sk_ar, *buffer_enc_alg;
-	char *buffer_int_alg, *buffer_spi_i, *buffer_spi_r;
+	char *buffer_sk_ei = NULL, *buffer_sk_er = NULL, *buffer_sk_ai = NULL;
+	char *buffer_sk_ar = NULL, *buffer_enc_alg = NULL;
+	char *buffer_int_alg = NULL, *buffer_spi_i = NULL, *buffer_spi_r = NULL;
 	FILE *wireshark_file;
 	char path[] = "/home/ubuntu/Desktop/ikev2_decryption_table";
-	chunk_t chunk_spi_i, chunk_spi_r, chunk_sk_ei, chunk_sk_er, chunk_sk_ai;
-	chunk_t chunk_sk_ar;
+	chunk_t chunk_spi_i = chunk_empty, chunk_spi_r = chunk_empty;
+	chunk_t chunk_sk_ei = chunk_empty, chunk_sk_er = chunk_empty;
+	chunk_t chunk_sk_ar = chunk_empty, chunk_sk_ai = chunk_empty;
 
 	if (ike_version == IKEV2)
 	{
@@ -192,16 +194,16 @@ METHOD(listener_t, save_ike_keys, bool,
 					buffer_enc_alg, hex_tolower(chunk_sk_ai.ptr), hex_tolower(chunk_sk_ar.ptr),
 					buffer_int_alg);
 				fclose(wireshark_file);
+				chunk_clear(&chunk_spi_i);
+				chunk_clear(&chunk_spi_r);
+				chunk_clear(&chunk_sk_ei);
+				chunk_clear(&chunk_sk_er);
+				chunk_clear(&chunk_sk_ai);
+				chunk_clear(&chunk_sk_ar);
 			}
 		}
 	}
 
-	chunk_clear(&chunk_spi_i);
-	chunk_clear(&chunk_spi_r);
-	chunk_clear(&chunk_sk_ei);
-	chunk_clear(&chunk_sk_er);
-	chunk_clear(&chunk_sk_ai);
-	chunk_clear(&chunk_sk_ar);
 	free(buffer_int_alg);
 	free(buffer_enc_alg);
 	chunk_clear(&this->spi_i);
