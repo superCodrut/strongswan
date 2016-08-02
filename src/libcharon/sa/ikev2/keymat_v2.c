@@ -270,7 +270,7 @@ static bool derive_ike_traditional(private_keymat_v2_t *this, uint16_t enc_alg,
 		goto failure;
 	}
 	sk_er = chunk_clone(key);
-	charon->bus->save_ike_keys(charon->bus, IKEV2, FALSE, sk_ei, sk_er, sk_ai,
+	charon->bus->save_ike_keys(charon->bus, IKEV2, sk_ei, sk_er, sk_ai,
 					sk_ar, enc_alg, enc_size, int_alg);
 	chunk_clear(&sk_ei);
 	chunk_clear(&sk_er);
