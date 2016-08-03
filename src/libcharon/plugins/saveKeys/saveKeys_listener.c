@@ -49,6 +49,46 @@ struct private_saveKeys_listener_t {
 	chunk_t spi_r;
 };
 
+/**
+ * Expands the name of encryption algorithms for wireshark decryption table.
+ */
+static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
+{
+	char *name;
+	switch (enc_alg) {
+		case ENCR_3DES:
+			name = malloc(strlen("3DES[RFC2451]") + 1);
+			strcpy(name, "3DES[RFC2451]");
+			break;
+		case ENCR_AES_CBC:
+			name = malloc(strlen("AES-CBC-128[RFC3602]") + 1);
+			strcpy(name, "AES-CBC-");
+			switch (size) {
+				case 128:
+					strcat(name, "128[RFC3602]");
+					break;
+				case 192:
+					strcat(name, "192[RFC3602]");
+					break;
+				case 256:
+					strcat(name, "256[RFC3602]");
+					break;
+				default:
+					free(name);
+					name = NULL;
+			}
+			break;
+		case ENCR_NULL:
+			name = malloc(strlen("NULL[RFC2410]") + 1);
+			strcpy(name, "NULL[RFC2410]");
+			break;
+		default:
+			name = NULL;
+			break;
+	}
+	return name;
+}
+
 METHOD(listener_t, send_spis, bool,
 	private_saveKeys_listener_t *this, chunk_t spi_i, chunk_t spi_r)
 {
@@ -91,6 +131,9 @@ METHOD(listener_t, save_ike_keys, bool,
         char *intt = enum_to_name(type2, int_alg);
         FILE *pr = fopen ("/tmp/alg_enc.txt", "w");
         fprintf(pr, "%s-%d", encc, key_size);
+	char *vb = expand_enc_name(enc_alg, key_size);
+	fprintf(pr, "\n\nNew name enc: %s\nenc:[%d]\n int[%d]\n", vb, enc_alg, int_alg);
+	free(vb);
         fclose(pr);
         FILE *pr1 = fopen ("/tmp/alg_int.txt", "w");
         fprintf(pr1, "%s", intt);
