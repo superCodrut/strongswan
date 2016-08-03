@@ -623,6 +623,36 @@ METHOD(bus_t, save_ike_keys, void,
 	this->mutex->unlock(this->mutex);
 }
 
+METHOD(bus_t, save_child_keys, void,
+	private_bus_t *this, chunk_t encr_i, chunk_t integ_i,
+	chunk_t encr_r, chunk_t integ_r, uint8_t protocol, uint16_t enc_alg,
+	uint16_t integ_alg)
+{
+        enumerator_t *enumerator;
+        entry_t *entry;
+        bool keep;
+
+        this->mutex->lock(this->mutex);
+        enumerator = this->listeners->create_enumerator(this->listeners);
+        while (enumerator->enumerate(enumerator, &entry))
+        {
+                if (entry->calling || !entry->listener->save_child_keys)
+                {
+                        continue;
+                }
+                entry->calling++;
+                keep = entry->listener->save_child_keys(entry->listener, encr_i, integ_i,
+						encr_r, integ_r, protocol, enc_alg, integ_alg);
+                entry->calling--;
+                if (!keep)
+                {
+                        unregister_listener(this, entry, enumerator);
+                }
+        }
+        enumerator->destroy(enumerator);
+        this->mutex->unlock(this->mutex);
+}
+
 METHOD(bus_t, send_spis, void,
 	private_bus_t *this, chunk_t spi_i, chunk_t spi_r)
 {
@@ -1120,6 +1150,7 @@ bus_t *bus_create()
 			.ike_keys = _ike_keys,
 			.save_ike_keys = _save_ike_keys,
 			.send_spis = _send_spis,
+			.save_child_keys = _save_child_keys,
 			.child_keys = _child_keys,
 			.ike_updown = _ike_updown,
 			.ike_rekey = _ike_rekey,
