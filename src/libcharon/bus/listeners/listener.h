@@ -120,6 +120,23 @@ struct listener_t {
 	bool (*send_spis)(listener_t *this, chunk_t spi_i, chunk_t spi_r);
 
 	/**
+	 * Save secret CHILD_SA keys hook.
+	 *
+	 * @param encr_i        
+	 * @param integ_i       
+	 * @param encr_r        
+	 * @param integ_r       
+	 * @param protocol      
+	 * @param enc_alg       
+	 * @param integ_alg     
+	 */
+	bool (*save_child_keys)(listener_t *this, chunk_t encr_i, chunk_t integ_i,
+					chunk_t encr_r, chunk_t integ_r,
+					uint8_t protocol, uint16_t enc_alg,
+					uint16_t integ_alg);
+
+
+	/**
 	 * Hook called with CHILD_SA key material.
 	 *
 	 * @param ike_sa	IKE_SA the child sa belongs to
