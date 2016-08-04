@@ -154,6 +154,47 @@ METHOD(listener_t, send_spis, bool,
 	return TRUE;
 }
 
+METHOD(listener_t, save_child_keys, bool,
+	private_saveKeys_listener_t *this, chunk_t encr_i, chunk_t integ_i,
+	chunk_t encr_r, chunk_t integ_r, uint8_t protocol, uint16_t enc_alg,
+	uint16_t integ_alg)
+{
+	chunk_t chunk_encr_i = chunk_empty, chunk_encr_r = chunk_empty;
+	chunk_t chunk_integ_i = chunk_empty, chunk_integ_r = chunk_empty;
+	char *buffer_encr_i = NULL, *buffer_encr_r = NULL, buffer_integ_i = NULL;
+	char *buffer_integ_r = NULL;
+	FILE *esp_file;
+	char *path_esp = malloc (strlen(this->directory_path) + strlen("esp_sa") + 1);
+	strcpy(path_esp, this->directory_path);
+	strcat(path_esp, "esp_sa");
+
+	esp_file = fopen(path_esp, "a");
+	chunk_encr_i = chunk_to_hex(encr_i, buffer_encr_i, FALSE);
+	chunk_encr_r = chunk_to_hex(encr_r, buffer_encr_r, FALSE);
+	chunk_integ_i = chunk_to_hex(integ_i, buffer_integ_i, FALSE);
+	chunk_integ_r = chunk_to_hex(integ_r, buffer_integ_r, FALSE);
+
+	fprintf(esp_file, "chunk_encr_i=%s\n\n", chunk_encr_i.ptr );
+	fprintf(esp_file, "chunk_integ_r=%s\n\n", chunk_encr_r.ptr );
+	fprintf(esp_file, "chunk_encr_i=%s\n\n", chunk_integ_i.ptr );
+	fprintf(esp_file, "chunk_integ_r=%s\n\n", chunk_integ_r.ptr );
+
+	fprintf(esp_file, "protocol=%u\n\n", protocol );
+	fprintf(esp_file, "enc_alg=%u\n\n", enc_alg );
+	fprintf(esp_file, "integ_alg=%u\n\n", integ_alg );
+
+
+	chunk_clear(&chunk_encr_i);
+	chunk_clear(&chunk_encr_r);
+	chunk_clear(&chunk_integ_i);
+	chunk_clear(&chunk_integ_r);
+
+	fclose(esp_file);
+	free(path_esp);
+	free(this->directory_path);
+	return TRUE;
+}
+
 METHOD(listener_t, save_ike_keys, bool,
         private_saveKeys_listener_t *this, ike_version_t ike_version,
 	chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai, chunk_t sk_ar, uint16_t enc_alg,
@@ -236,6 +277,7 @@ saveKeys_listener_t *saveKeys_listener_create()
 			.listener = {
 				.save_ike_keys = _save_ike_keys,
 				.send_spis = _send_spis,
+				.save_child_keys = _save_child_keys,
 			},
 		}
 	);
