@@ -119,22 +119,28 @@ struct listener_t {
 	 */
 	bool (*send_spis)(listener_t *this, chunk_t spi_i, chunk_t spi_r);
 
-	/**
-	 * Save secret CHILD_SA keys hook.
-	 *
-	 * @param encr_i        
-	 * @param integ_i       
-	 * @param encr_r        
-	 * @param integ_r       
-	 * @param protocol      
-	 * @param enc_alg       
-	 * @param integ_alg     
-	 */
-	bool (*save_child_keys)(listener_t *this, chunk_t encr_i, chunk_t integ_i,
-					chunk_t encr_r, chunk_t integ_r,
-					uint8_t protocol, uint16_t enc_alg,
-					uint16_t integ_alg);
-
+        /**
+         * Save secret CHILD_SA keys hook.
+         *
+         * @param ike_version   IKEV1 for IKEv1, IKEV2 for IKEv2
+         * @param protocol      4 for IPv4, 6 for IPv6
+         * @param enc_alg       Name for encryption algorithm
+         * @param int_alg       Name for integrity algorithm
+         * @param init_ip       IP address for initiator
+         * @param resp_ip       IP address for responder
+         * @param spi_out       SPI for outbound SA
+         * @param encr_key_out  Encryption key for outbound SA
+         * @param int_key_out   Integrity key for outbound SA
+         * @param spi_in        SPI for inbound SA
+         * @param encr_key_in   Encryption key for inbound SA
+         * @param int_key_out   Integrity key for inbound SA
+         */
+	bool (*save_child_keys)(listener_t *this, ike_version_t ike_version,
+			int protocol, uint16_t enc_alg, uint16_t int_alg,
+			chunk_t init_ip, chunk_t resp_ip, uint32_t spi_out,
+			chunk_t encr_key_out, chunk_t int_key_out,
+			uint32_t spi_in, chunk_t encr_key_in,
+			chunk_t int_key_in);
 
 	/**
 	 * Hook called with CHILD_SA key material.

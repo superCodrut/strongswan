@@ -624,9 +624,10 @@ METHOD(bus_t, save_ike_keys, void,
 }
 
 METHOD(bus_t, save_child_keys, void,
-	private_bus_t *this, chunk_t encr_i, chunk_t integ_i,
-	chunk_t encr_r, chunk_t integ_r, uint8_t protocol, uint16_t enc_alg,
-	uint16_t integ_alg)
+	private_bus_t *this, ike_version_t ike_version, int protocol,
+	uint16_t enc_alg, uint16_t int_alg, chunk_t init_ip, chunk_t resp_ip,
+	uint32_t spi_out, chunk_t encr_key_out, chunk_t int_key_out,
+	uint32_t spi_in, chunk_t encr_key_in, chunk_t int_key_in)
 {
         enumerator_t *enumerator;
         entry_t *entry;
@@ -641,8 +642,11 @@ METHOD(bus_t, save_child_keys, void,
                         continue;
                 }
                 entry->calling++;
-                keep = entry->listener->save_child_keys(entry->listener, encr_i, integ_i,
-						encr_r, integ_r, protocol, enc_alg, integ_alg);
+                keep = entry->listener->save_child_keys(entry->listener, ike_version,
+					protocol, enc_alg, int_alg, init_ip,
+					resp_ip, spi_out, encr_key_out,
+					int_key_out, spi_in, encr_key_in,
+					int_key_in);
                 entry->calling--;
                 if (!keep)
                 {
