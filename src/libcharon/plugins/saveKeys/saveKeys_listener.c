@@ -218,7 +218,6 @@ METHOD(listener_t, save_ike_keys, bool,
 	chunk_clear(&this->spi_i);
 	chunk_clear(&this->spi_r);
 	free(path_ikev2);
-	free(this->directory_path);
 	free(path_ikev1);
 
         return TRUE;
