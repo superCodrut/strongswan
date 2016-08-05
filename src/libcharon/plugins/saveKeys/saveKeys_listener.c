@@ -100,6 +100,24 @@ static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
 }
 
 /**
+ * Reverse SPI ESP
+ */
+static inline uint32_t byte_reverse_32(uint32_t num) {
+    union bytes {
+        uint8_t b[4];
+        uint32_t n;
+    } bytes;
+    uint8_t t;
+
+    bytes.n = num;
+
+    t = bytes.b[0]; bytes.b[0] = bytes.b[3]; bytes.b[3] = t;
+    t = bytes.b[1]; bytes.b[1] = bytes.b[2]; bytes.b[2] = t;
+
+    return bytes.n;
+}
+
+/**
  * Expands the name of integrity algorithms for wireshark decryption table.
  */
 static inline char *expand_int_name(uint16_t int_alg)
@@ -163,9 +181,8 @@ METHOD(listener_t, save_child_keys, bool,
 {
 	chunk_t chunk_encr_out = chunk_empty, chunk_encr_in = chunk_empty;
 	chunk_t chunk_integ_out = chunk_empty, chunk_integ_in = chunk_empty;
-	chunk_t chunk_init_ip = chunk_empty, chunk_resp_ip = chunk_empty;
 	char *buffer_encr_out = NULL, *buffer_encr_in = NULL, *buffer_integ_in = NULL;
-	char *buffer_integ_out = NULL, *buffer_init_ip = NULL, *buffer_resp_ip = NULL;
+	char *buffer_integ_out = NULL;
 	FILE *esp_file;
 	char *path_esp = malloc (strlen(this->directory_path) + strlen("esp_sa") + 1);
 	strcpy(path_esp, this->directory_path);
@@ -176,15 +193,19 @@ METHOD(listener_t, save_child_keys, bool,
 	chunk_encr_in = chunk_to_hex(encr_key_in, buffer_encr_in, FALSE);
 	chunk_integ_in = chunk_to_hex(int_key_in, buffer_integ_in, FALSE);
 	chunk_integ_out = chunk_to_hex(int_key_out, buffer_integ_out, FALSE);
-	chunk_init_ip = chunk_to_hex(init_ip, buffer_init_ip, FALSE);
-	chunk_resp_ip = chunk_to_hex(resp_ip, buffer_resp_ip, FALSE);
 
 	fprintf(esp_file, "chunk_encr_out=%s\n\n", chunk_encr_out.ptr);
 	fprintf(esp_file, "chunk_encr_in=%s\n\n", chunk_encr_in.ptr);
 	fprintf(esp_file, "chunk_integ_in=%s\n\n", chunk_integ_in.ptr);
 	fprintf(esp_file, "chunk_integ_out=%s\n\n", chunk_integ_out.ptr);
-	fprintf(esp_file, "init_ip=%s\n\n", chunk_init_ip.ptr);
-	fprintf(esp_file, "resp_ip=%s\n\n", chunk_resp_ip.ptr);
+	fprintf(esp_file, "init_ip=%d.%d.%d.%d\n\n", init_ip.ptr[0], init_ip.ptr[1],
+						init_ip.ptr[2], init_ip.ptr[3]);
+	fprintf(esp_file, "resp_ip=%d.%d.%d.%d\n\n", resp_ip.ptr[0], resp_ip.ptr[1],
+						resp_ip.ptr[2], resp_ip.ptr[3]);
+
+	fprintf(esp_file, "spi_out=0x%08x\n\n", byte_reverse_32(spi_out));
+	fprintf(esp_file, "spi_in=0x%08x\n\n", byte_reverse_32(spi_in));
+
 
 	fprintf(esp_file, "enc_alg=%u\n\n", enc_alg);
 	fprintf(esp_file, "integ_alg=%u\n\n", int_alg);
@@ -195,8 +216,6 @@ METHOD(listener_t, save_child_keys, bool,
 	chunk_clear(&chunk_encr_out);
 	chunk_clear(&chunk_integ_in);
 	chunk_clear(&chunk_integ_out);
-	chunk_clear(&chunk_init_ip);
-	chunk_clear(&chunk_resp_ip);
 
 	fclose(esp_file);
 	free(path_esp);
