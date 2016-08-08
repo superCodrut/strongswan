@@ -308,42 +308,46 @@ METHOD(listener_t, save_child_keys, bool,
 	chunk_t chunk_encr_out = chunk_empty, chunk_encr_in = chunk_empty;
 	chunk_t chunk_integ_out = chunk_empty, chunk_integ_in = chunk_empty;
 	char *buffer_encr_out = NULL, *buffer_encr_in = NULL, *buffer_integ_in = NULL;
-	char *buffer_integ_out = NULL;
+	char *buffer_integ_out = NULL, *name_enc_alg = NULL, *name_int_alg = NULL;
 	FILE *esp_file;
 	char *path_esp = malloc (strlen(this->directory_path) + strlen("esp_sa") + 1);
 	strcpy(path_esp, this->directory_path);
 	strcat(path_esp, "esp_sa");
 
-	esp_file = fopen(path_esp, "a");
+	esp_file = fopen(path_esp, "w");
 	chunk_encr_out = chunk_to_hex(encr_key_out, buffer_encr_out, FALSE);
 	chunk_encr_in = chunk_to_hex(encr_key_in, buffer_encr_in, FALSE);
 	chunk_integ_in = chunk_to_hex(int_key_in, buffer_integ_in, FALSE);
 	chunk_integ_out = chunk_to_hex(int_key_out, buffer_integ_out, FALSE);
 
-	fprintf(esp_file, "chunk_encr_out=%s\n\n", chunk_encr_out.ptr);
-	fprintf(esp_file, "chunk_encr_in=%s\n\n", chunk_encr_in.ptr);
-	fprintf(esp_file, "chunk_integ_in=%s\n\n", chunk_integ_in.ptr);
-	fprintf(esp_file, "chunk_integ_out=%s\n\n", chunk_integ_out.ptr);
-	fprintf(esp_file, "init_ip=%d.%d.%d.%d\n\n", init_ip.ptr[0], init_ip.ptr[1],
-						init_ip.ptr[2], init_ip.ptr[3]);
-	fprintf(esp_file, "resp_ip=%d.%d.%d.%d\n\n", resp_ip.ptr[0], resp_ip.ptr[1],
-						resp_ip.ptr[2], resp_ip.ptr[3]);
+	name_enc_alg = esp_expand_enc_name(enc_alg, &icv_length);
+	name_int_alg = esp_expand_int_name(int_alg, icv_length);
 
-	fprintf(esp_file, "spi_out=0x%08x\n\n", byte_reverse_32(spi_out));
-	fprintf(esp_file, "spi_in=0x%08x\n\n", byte_reverse_32(spi_in));
+	if (name_enc_alg && name_int_alg)
+	{
+		if (protocol == 4)
+		{ // IPv4
+			fprintf(esp_file, "\"IPv4\",\"%d.%d.%d.%d\",\"%d.%d.%d.%d\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				init_ip.ptr[0], init_ip.ptr[1], init_ip.ptr[2], init_ip.ptr[3], resp_ip.ptr[0], resp_ip.ptr[1],
+				resp_ip.ptr[2], resp_ip.ptr[3], byte_reverse_32(spi_out), name_enc_alg, chunk_encr_out.ptr,
+				name_int_alg, chunk_integ_out.ptr);
+			fprintf(esp_file, "\"IPv4\",\"%d.%d.%d.%d\",\"%d.%d.%d.%d\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				resp_ip.ptr[0], resp_ip.ptr[1], resp_ip.ptr[2], resp_ip.ptr[3], init_ip.ptr[0], init_ip.ptr[1],
+				init_ip.ptr[2], init_ip.ptr[3], byte_reverse_32(spi_in), name_enc_alg, chunk_encr_in.ptr,
+				name_int_alg, chunk_integ_in.ptr);
+		}
+		else
+		{ // IPv6
 
-
-	fprintf(esp_file, "enc_alg=%s\n\n", esp_expand_enc_name(enc_alg, &icv_length));
-	fprintf(esp_file, "icv_length=%d\n\n", icv_length);
-	fprintf(esp_file, "integ_alg=%s\n\n", esp_expand_int_name(int_alg, icv_length) );
-	fprintf(esp_file, "protocol=%d\n\n", protocol);
-
-
+		}
+	}
 	chunk_clear(&chunk_encr_in);
 	chunk_clear(&chunk_encr_out);
 	chunk_clear(&chunk_integ_in);
 	chunk_clear(&chunk_integ_out);
 
+	free(name_int_alg);
+	free(name_enc_alg);
 	fclose(esp_file);
 	free(path_esp);
 	free(this->directory_path);
