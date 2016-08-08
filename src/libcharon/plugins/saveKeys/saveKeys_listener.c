@@ -179,6 +179,69 @@ static inline uint32_t byte_reverse_32(uint32_t num) {
 }
 
 /**
+ * Expands the name of integrity algorithms for ESP decryption table.
+ */
+static inline char *esp_expand_int_name(uint16_t int_alg, int icv_length)
+{
+	char *name;
+	if (icv_length == -1)
+	{
+		switch (int_alg)
+		{
+			case AUTH_HMAC_SHA1_96:
+				name = malloc(strlen("HMAC-SHA-1-96 [RFC2404]") + 1);
+				strcpy(name, "HMAC-SHA-1-96 [RFC2404]");
+				break;
+			case AUTH_HMAC_SHA2_256_96:
+				name = malloc(strlen("HMAC-SHA-256-96 [draft-ietf-ipsec-ciph-sha-256-00]") + 1);
+				strcpy(name, "HMAC-SHA-256-96 [draft-ietf-ipsec-ciph-sha-256-00]");
+				break;
+			case AUTH_HMAC_MD5_96:
+				name = malloc(strlen("HMAC-MD5-96 [RFC2403]") + 1);
+				strcpy(name, "HMAC-MD5-96 [RFC2403]");
+				break;
+			case AUTH_HMAC_SHA2_256_128:
+				name = malloc(strlen("HMAC-SHA-256-128 [RFC4868]") + 1);
+				strcpy(name, "HMAC-SHA-256-128 [RFC4868]");
+				break;
+			case AUTH_HMAC_SHA2_384_192:
+				name = malloc(strlen("HMAC-SHA-384-192 [RFC4868]") + 1);
+				strcpy(name, "HMAC-SHA-384-192 [RFC4868]");
+				break;
+			case AUTH_HMAC_SHA2_512_256:
+				name = malloc(strlen("HMAC-SHA-512-256 [RFC4868]") + 1);
+				strcpy(name, "HMAC-SHA-512-256 [RFC4868]");
+				break;
+			default:
+				name = NULL;
+				break;
+		}
+	}
+	else
+	{
+		switch (icv_length)
+		{
+			case 128:
+				name = malloc(strlen("ANY 128 bit authentication [no checking]") + 1);
+				strcpy(name, "ANY 128 bit authentication [no checking]");
+				break;
+			case 192:
+				name = malloc(strlen("ANY 192 bit authentication [no checking]") + 1);
+				strcpy(name, "ANY 192 bit authentication [no checking]");
+				break;
+			case 256:
+				name = malloc(strlen("ANY 256 bit authentication [no checking]") + 1);
+				strcpy(name, "ANY 256 bit authentication [no checking]");
+				break;
+			default:
+				name = NULL;
+				break;
+		}
+	}
+	return name;
+}
+
+/**
  * Expands the name of integrity algorithms for IKE decryption table.
  */
 static inline char *expand_int_name(uint16_t int_alg)
@@ -272,7 +335,7 @@ METHOD(listener_t, save_child_keys, bool,
 
 	fprintf(esp_file, "enc_alg=%s\n\n", esp_expand_enc_name(enc_alg, &icv_length));
 	fprintf(esp_file, "icv_length=%d\n\n", icv_length);
-	fprintf(esp_file, "integ_alg=%u\n\n", int_alg);
+	fprintf(esp_file, "integ_alg=%s\n\n", esp_expand_int_name(int_alg, icv_length) );
 	fprintf(esp_file, "protocol=%d\n\n", protocol);
 
 
