@@ -60,7 +60,7 @@ struct private_saveKeys_listener_t {
 };
 
 /**
- * Expands the name of encryption algorithms for wireshark decryption table.
+ * Expands the name of encryption algorithms for IKE decryption table.
  */
 static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
 {
@@ -100,6 +100,67 @@ static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
 }
 
 /**
+ * Expands the name of encryption algorithms for ESP decryption table.
+ */
+static inline char *esp_expand_enc_name(uint16_t enc_alg, int *ICV_length)
+{
+	char *name;
+	switch (enc_alg) {
+		case ENCR_NULL:
+			name = malloc(strlen("NULL") + 1);
+			strcpy(name, "NULL");
+			break;
+		case ENCR_3DES:
+			name = malloc(strlen("TripleDes-CBC [RFC2451]") + 1);
+			strcpy(name, "TripleDes-CBC [RFC2451]");
+			break;
+		case ENCR_AES_CBC:
+			name = malloc(strlen("AES-CBC [RFC3602]") + 1);
+			strcpy(name, "AES-CBC [RFC3602]");
+			break;
+		case ENCR_AES_CTR:
+			name = malloc(strlen("AES-CTR [RFC3686]") + 1);
+			strcpy(name, "AES-CTR [RFC3686]");
+			break; 
+		case ENCR_DES:
+			name = malloc(strlen("DES-CBC [RFC2405]") + 1);
+			strcpy(name, "DES-CBC [RFC2405]");
+			break;
+		case ENCR_CAST:
+			name = malloc(strlen("CAST5-CBC [RFC2144]") + 1);
+			strcpy(name, "CAST5-CBC [RFC2144]");
+			break;
+		case ENCR_BLOWFISH:
+			name = malloc(strlen("BLOWFISH-CBC [RFC2451]") + 1);
+			strcpy(name, "BLOWFISH-CBC [RFC2451]");
+			break;
+		case ENCR_TWOFISH_CBC:
+			name = malloc(strlen("TWOFISH-CBC") + 1);
+			strcpy(name, "TWOFISH-CBC");
+			break;
+		case ENCR_AES_GCM_ICV8:
+			(*ICV_length) = 128;
+			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
+			strcpy(name, "AES-GCM [RFC4106]");
+			break;
+		case ENCR_AES_GCM_ICV12:
+			(*ICV_length) = 192;
+			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
+			strcpy(name, "AES-GCM [RFC4106]");
+			break;
+		case ENCR_AES_GCM_ICV16:
+			(*ICV_length) = 256;
+			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
+			strcpy(name, "AES-GCM [RFC4106]");
+			break;
+		default:
+			name = NULL;
+			break;
+	}
+	return name;
+}
+
+/**
  * Reverse SPI ESP
  */
 static inline uint32_t byte_reverse_32(uint32_t num) {
@@ -118,7 +179,7 @@ static inline uint32_t byte_reverse_32(uint32_t num) {
 }
 
 /**
- * Expands the name of integrity algorithms for wireshark decryption table.
+ * Expands the name of integrity algorithms for IKE decryption table.
  */
 static inline char *expand_int_name(uint16_t int_alg)
 {
@@ -126,7 +187,8 @@ static inline char *expand_int_name(uint16_t int_alg)
 	enum_name_t *type2 = transform_get_enum_names(INTEGRITY_ALGORITHM);
 	char *short_int_alg = enum_to_name(type2, int_alg);
 	int size_short_name = strlen(short_int_alg);
-	switch (int_alg) {
+	switch (int_alg)
+	{
 		case AUTH_HMAC_MD5_96:
 			name = malloc(size_short_name + strlen(" [RFC2403]")  + 1);
 			strcpy(name, short_int_alg);
@@ -179,6 +241,7 @@ METHOD(listener_t, save_child_keys, bool,
 	chunk_t int_key_out, uint32_t spi_in, chunk_t encr_key_in,
 	chunk_t int_key_in)
 {
+	int icv_length = -1;
 	chunk_t chunk_encr_out = chunk_empty, chunk_encr_in = chunk_empty;
 	chunk_t chunk_integ_out = chunk_empty, chunk_integ_in = chunk_empty;
 	char *buffer_encr_out = NULL, *buffer_encr_in = NULL, *buffer_integ_in = NULL;
@@ -207,7 +270,8 @@ METHOD(listener_t, save_child_keys, bool,
 	fprintf(esp_file, "spi_in=0x%08x\n\n", byte_reverse_32(spi_in));
 
 
-	fprintf(esp_file, "enc_alg=%u\n\n", enc_alg);
+	fprintf(esp_file, "enc_alg=%s\n\n", esp_expand_enc_name(enc_alg, &icv_length));
+	fprintf(esp_file, "icv_length=%d\n\n", icv_length);
 	fprintf(esp_file, "integ_alg=%u\n\n", int_alg);
 	fprintf(esp_file, "protocol=%d\n\n", protocol);
 
