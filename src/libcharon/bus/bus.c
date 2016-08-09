@@ -625,7 +625,7 @@ METHOD(bus_t, save_ike_keys, void,
 
 METHOD(bus_t, save_child_keys, void,
 	private_bus_t *this, ike_version_t ike_version, int protocol,
-	uint16_t enc_alg, uint16_t int_alg, chunk_t init_ip, chunk_t resp_ip,
+	uint16_t enc_alg, uint16_t int_alg, host_t *init_ip, host_t *resp_ip,
 	uint32_t spi_out, chunk_t encr_key_out, chunk_t int_key_out,
 	uint32_t spi_in, chunk_t encr_key_in, chunk_t int_key_in)
 {

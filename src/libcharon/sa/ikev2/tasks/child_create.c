@@ -657,21 +657,18 @@ static status_t select_and_install(private_child_create_t *this,
 							FALSE, this->tfcv3, my_ts, other_ts);
 			int protocol;
 			uint16_t enc_alg, int_alg, size = 0;
-			chunk_t init_ip = chunk_empty, resp_ip = chunk_empty;
 
 			host_t *my_host = this->ike_sa->get_my_host(this->ike_sa);
 			host_t *other_host = this->ike_sa->get_other_host(this->ike_sa);
 
-			init_ip = my_host->get_address(my_host);
-			resp_ip = other_host->get_address(other_host);
-			protocol = init_ip.len;
+			protocol = my_host->get_family(my_host) == AF_INET ? 4 : 16;
 			this->proposal->get_algorithm(this->proposal, ENCRYPTION_ALGORITHM,
 										&enc_alg, &size);
 			this->proposal->get_algorithm(this->proposal, INTEGRITY_ALGORITHM,
 										&int_alg, &size);
 
 			charon->bus->save_child_keys(charon->bus, IKEV2, protocol, enc_alg, int_alg,
-							init_ip, resp_ip, this->other_spi, encr_i,
+							my_host, other_host, this->other_spi, encr_i,
 							integ_i, this->my_spi, encr_r, integ_r);
 		}
 		else
