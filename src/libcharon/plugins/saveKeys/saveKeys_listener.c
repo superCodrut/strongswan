@@ -336,7 +336,12 @@ METHOD(listener_t, save_child_keys, bool,
 		}
 		else
 		{ // IPv6
-
+			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				init_ip, resp_ip, byte_reverse_32(spi_out), name_enc_alg, chunk_encr_out.ptr,
+				name_int_alg, chunk_integ_out.ptr);
+			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				resp_ip, init_ip, byte_reverse_32(spi_in), name_enc_alg, chunk_encr_in.ptr,
+				name_int_alg, chunk_integ_in.ptr);
 		}
 	}
 	chunk_clear(&chunk_encr_in);
