@@ -367,12 +367,12 @@ METHOD(listener_t, save_ike_keys, bool,
 	chunk_t chunk_sk_ei = chunk_empty, chunk_sk_er = chunk_empty;
 	chunk_t chunk_sk_ar = chunk_empty, chunk_sk_ai = chunk_empty;
 
-	char *path_ikev2 = malloc (strlen(this->directory_path) + strlen("ikev2_decrytion_table") + 1);
-	char *path_ikev1 = malloc (strlen(this->directory_path) + strlen("ikev1_decrytion_table") + 1);
+	char *path_ikev2 = malloc (strlen(this->directory_path) + strlen("ikev2_decryption_table") + 1);
+	char *path_ikev1 = malloc (strlen(this->directory_path) + strlen("ikev1_decryption_table") + 1);
 	strcpy(path_ikev2, this->directory_path);
 	strcpy(path_ikev1, this->directory_path);
-	strcat(path_ikev2, "ikev2_decrytion_table");
-	strcat(path_ikev1, "ikev1_decrytion_table");
+	strcat(path_ikev2, "ikev2_decryption_table");
+	strcat(path_ikev1, "ikev1_decryption_table");
 
 	if (ike_version == IKEV2)
 	{
