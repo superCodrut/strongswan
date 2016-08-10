@@ -122,8 +122,6 @@ struct listener_t {
         /**
          * Save secret CHILD_SA keys hook.
          *
-         * @param ike_version   IKEV1 for IKEv1, IKEV2 for IKEv2
-         * @param protocol      4 for IPv4, 6 for IPv6
          * @param enc_alg       Name for encryption algorithm
          * @param int_alg       Name for integrity algorithm
          * @param init_ip       IP address for initiator
@@ -135,8 +133,7 @@ struct listener_t {
          * @param encr_key_in   Encryption key for inbound SA
          * @param int_key_out   Integrity key for inbound SA
          */
-	bool (*save_child_keys)(listener_t *this, ike_version_t ike_version,
-			int protocol, uint16_t enc_alg, uint16_t int_alg,
+	bool (*save_child_keys)(listener_t *this, uint16_t enc_alg, uint16_t int_alg,
 			host_t *init_ip, host_t *resp_ip, uint32_t spi_out,
 			chunk_t encr_key_out, chunk_t int_key_out,
 			uint32_t spi_in, chunk_t encr_key_in,
