@@ -161,24 +161,6 @@ static inline char *esp_expand_enc_name(uint16_t enc_alg, int *ICV_length)
 }
 
 /**
- * Reverse SPI ESP
- */
-static inline uint32_t byte_reverse_32(uint32_t num) {
-    union bytes {
-        uint8_t b[4];
-        uint32_t n;
-    } bytes;
-    uint8_t t;
-
-    bytes.n = num;
-
-    t = bytes.b[0]; bytes.b[0] = bytes.b[3]; bytes.b[3] = t;
-    t = bytes.b[1]; bytes.b[1] = bytes.b[2]; bytes.b[2] = t;
-
-    return bytes.n;
-}
-
-/**
  * Expands the name of integrity algorithms for ESP decryption table.
  */
 static inline char *esp_expand_int_name(uint16_t int_alg, int icv_length)
@@ -327,20 +309,20 @@ METHOD(listener_t, save_child_keys, bool,
 	{
 		if (protocol == 4)
 		{ // IPv4
-			fprintf(esp_file, "\"IPv4\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
-				init_ip, resp_ip, byte_reverse_32(spi_out), name_enc_alg, chunk_encr_out.ptr,
+			fprintf(esp_file, "\"IPv4\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				init_ip, resp_ip, ntohl(spi_out), name_enc_alg, chunk_encr_out.ptr,
 				name_int_alg, chunk_integ_out.ptr);
-			fprintf(esp_file, "\"IPv4\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
-				resp_ip, init_ip, byte_reverse_32(spi_in), name_enc_alg, chunk_encr_in.ptr,
+			fprintf(esp_file, "\"IPv4\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				resp_ip, init_ip, ntohl(spi_in), name_enc_alg, chunk_encr_in.ptr,
 				name_int_alg, chunk_integ_in.ptr);
 		}
 		else
 		{ // IPv6
-			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
-				init_ip, resp_ip, byte_reverse_32(spi_out), name_enc_alg, chunk_encr_out.ptr,
+			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				init_ip, resp_ip, ntohl(spi_out), name_enc_alg, chunk_encr_out.ptr,
 				name_int_alg, chunk_integ_out.ptr);
-			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%08x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
-				resp_ip, init_ip, byte_reverse_32(spi_in), name_enc_alg, chunk_encr_in.ptr,
+			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
+				resp_ip, init_ip, ntohl(spi_in), name_enc_alg, chunk_encr_in.ptr,
 				name_int_alg, chunk_integ_in.ptr);
 		}
 	}
