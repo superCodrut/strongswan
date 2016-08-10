@@ -484,6 +484,9 @@ static status_t select_and_install(private_child_create_t *this,
 	linked_list_t *my_ts, *other_ts;
 	host_t *me, *other;
 	bool private, prefer_configured;
+	int protocol;
+	uint16_t enc_alg, int_alg, size = 0;
+	host_t *my_host = NULL, *other_host = NULL;
 
 	if (this->proposals == NULL)
 	{
@@ -647,6 +650,13 @@ static status_t select_and_install(private_child_create_t *this,
 	if (this->keymat->derive_child_keys(this->keymat, this->proposal,
 			this->dh, nonce_i, nonce_r, &encr_i, &integ_i, &encr_r, &integ_r))
 	{
+		my_host = this->ike_sa->get_my_host(this->ike_sa);
+		other_host = this->ike_sa->get_other_host(this->ike_sa);
+		protocol = my_host->get_family(my_host) == AF_INET ? 4 : 16;
+		this->proposal->get_algorithm(this->proposal, ENCRYPTION_ALGORITHM,
+								&enc_alg, &size);
+		this->proposal->get_algorithm(this->proposal, INTEGRITY_ALGORITHM,
+								&int_alg, &size);
 		if (this->initiator)
 		{
 			status_i = this->child_sa->install(this->child_sa, encr_r, integ_r,
@@ -655,17 +665,7 @@ static status_t select_and_install(private_child_create_t *this,
 			status_o = this->child_sa->install(this->child_sa, encr_i, integ_i,
 							this->other_spi, this->other_cpi, this->initiator,
 							FALSE, this->tfcv3, my_ts, other_ts);
-			int protocol;
-			uint16_t enc_alg, int_alg, size = 0;
 
-			host_t *my_host = this->ike_sa->get_my_host(this->ike_sa);
-			host_t *other_host = this->ike_sa->get_other_host(this->ike_sa);
-
-			protocol = my_host->get_family(my_host) == AF_INET ? 4 : 16;
-			this->proposal->get_algorithm(this->proposal, ENCRYPTION_ALGORITHM,
-										&enc_alg, &size);
-			this->proposal->get_algorithm(this->proposal, INTEGRITY_ALGORITHM,
-										&int_alg, &size);
 
 			charon->bus->save_child_keys(charon->bus, IKEV2, protocol, enc_alg, int_alg,
 							my_host, other_host, this->other_spi, encr_i,
@@ -679,6 +679,9 @@ static status_t select_and_install(private_child_create_t *this,
 			status_o = this->child_sa->install(this->child_sa, encr_r, integ_r,
 							this->other_spi, this->other_cpi, this->initiator,
 							FALSE, this->tfcv3, my_ts, other_ts);
+			charon->bus->save_child_keys(charon->bus, IKEV2, protocol, enc_alg, int_alg,
+							other_host, my_host, this->my_spi, encr_i,
+							integ_i, this->other_spi, encr_r, integ_r);
 		}
 	}
 	chunk_clear(&integ_i);
