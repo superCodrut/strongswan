@@ -280,9 +280,9 @@ METHOD(listener_t, send_spis, bool,
 }
 
 METHOD(listener_t, save_child_keys, bool,
-	private_saveKeys_listener_t *this, ike_version_t ike_version,
-	int protocol, uint16_t enc_alg, uint16_t int_alg, host_t *init_ip,
-	host_t *resp_ip, uint32_t spi_out, chunk_t encr_key_out,
+	private_saveKeys_listener_t *this, uint16_t enc_alg,
+	uint16_t int_alg, host_t *init_ip, host_t *resp_ip,
+	uint32_t spi_out, chunk_t encr_key_out,
 	chunk_t int_key_out, uint32_t spi_in, chunk_t encr_key_in,
 	chunk_t int_key_in)
 {
@@ -307,7 +307,7 @@ METHOD(listener_t, save_child_keys, bool,
 
 	if (name_enc_alg && name_int_alg)
 	{
-		if (protocol == 4)
+		if (init_ip->get_family(init_ip) == AF_INET)
 		{ // IPv4
 			fprintf(esp_file, "\"IPv4\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
 				init_ip, resp_ip, ntohl(spi_out), name_enc_alg, chunk_encr_out.ptr,
@@ -316,7 +316,7 @@ METHOD(listener_t, save_child_keys, bool,
 				resp_ip, init_ip, ntohl(spi_in), name_enc_alg, chunk_encr_in.ptr,
 				name_int_alg, chunk_integ_in.ptr);
 		}
-		else
+		else if (init_ip->get_family(init_ip) == AF_INET6)
 		{ // IPv6
 			fprintf(esp_file, "\"IPv6\",\"%H\",\"%H\",\"0x%.8x\",\"%s\",\"0x%s\",\"%s\",\"0x%s\"\n",
 				init_ip, resp_ip, ntohl(spi_out), name_enc_alg, chunk_encr_out.ptr,

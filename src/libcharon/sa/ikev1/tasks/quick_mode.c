@@ -286,7 +286,6 @@ static bool install(private_quick_mode_t *this)
 	chunk_t encr_i, encr_r, integ_i, integ_r;
 	linked_list_t *tsi, *tsr, *my_ts, *other_ts;
 	child_sa_t *old = NULL;
-	int protocol;
 	uint16_t enc_alg, int_alg, size = 0;
 	host_t *my_host = NULL, *other_host = NULL;
 
@@ -335,7 +334,6 @@ static bool install(private_quick_mode_t *this)
 	{
 		my_host = this->ike_sa->get_my_host(this->ike_sa);
 		other_host = this->ike_sa->get_other_host(this->ike_sa);
-		protocol = my_host->get_family(my_host) == AF_INET ? 4 : 16;
 		this->proposal->get_algorithm(this->proposal, ENCRYPTION_ALGORITHM,
 								&enc_alg, &size);
 		this->proposal->get_algorithm(this->proposal, INTEGRITY_ALGORITHM,
@@ -348,9 +346,8 @@ static bool install(private_quick_mode_t *this)
 			status_o = this->child_sa->install(this->child_sa,
 									encr_i, integ_i, this->spi_r, this->cpi_r,
 									this->initiator, FALSE, FALSE, tsi, tsr);
-			charon->bus->save_child_keys(charon->bus, IKEV1, protocol, enc_alg, int_alg,
-							my_host, other_host, this->spi_r, encr_i,
-							integ_i, this->spi_i, encr_r, integ_r);
+			charon->bus->save_child_keys(charon->bus, enc_alg, int_alg, my_host, other_host,
+							this->spi_r, encr_i, integ_i, this->spi_i, encr_r, integ_r);
 		}
 		else
 		{
@@ -360,9 +357,8 @@ static bool install(private_quick_mode_t *this)
 			status_o = this->child_sa->install(this->child_sa,
 									encr_r, integ_r, this->spi_i, this->cpi_i,
 									this->initiator, FALSE, FALSE, tsr, tsi);
-			charon->bus->save_child_keys(charon->bus, IKEV2, protocol, enc_alg, int_alg,
-							other_host, my_host, this->spi_r, encr_i,
-							integ_i, this->spi_i, encr_r, integ_r);
+			charon->bus->save_child_keys(charon->bus, enc_alg, int_alg, other_host, my_host,
+							this->spi_r, encr_i, integ_i, this->spi_i, encr_r, integ_r);
 		}
 	}
 	chunk_clear(&integ_i);
