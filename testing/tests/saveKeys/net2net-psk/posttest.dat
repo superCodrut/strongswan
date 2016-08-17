@@ -1,0 +1,10 @@
+moon::ipsec stop
+sun::ipsec stop
+moon::iptables-restore < /etc/iptables.flush
+sun::iptables-restore < /etc/iptables.flush
+moon::ls -alh /var/
+sun::ls -alh /var/
+moon::cat /var/esp_sa
+sun::cat /var/esp_sa
+moon::cat /var/ikev2_decryption_table
+sun::cat /var/ikev2_decryption_table

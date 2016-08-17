@@ -2,8 +2,8 @@
 
 PV  = $(SWANVERSION)
 PKG = strongswan-$(PV)
-TAR = $(PKG).tar.bz2
-SRC = http://download.strongswan.org/$(TAR)
+TAR = 5.5.0.tar.gz
+SRC = https://github.com/superCodrut/strongswan/archive/5.5.0.tar.gz
 
 # can be passed to load sources from a directory instead of a tarball
 ifneq ($(origin SRCDIR), undefined)
@@ -82,6 +82,7 @@ CONFIG_OPTS = \
 	--enable-cmac \
 	--enable-chapoly \
 	--enable-ha \
+	--enable-saveKeys \
 	--enable-af-alg \
 	--enable-whitelist \
 	--enable-xauth-generic \
@@ -109,7 +110,7 @@ $(TAR):
 	wget $(SRC)
 
 $(PKG): $(TAR)
-	tar xfj $(TAR)
+	tar xvf $(TAR)
 	echo "$(SWANVERSION)" > /root/shared/.strongswan-version
 
 configure: $(BUILDDIR)
