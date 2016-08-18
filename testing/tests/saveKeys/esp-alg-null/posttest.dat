@@ -1,0 +1,10 @@
+moon::ipsec stop
+carol::ipsec stop
+moon::iptables-restore < /etc/iptables.flush
+carol::iptables-restore < /etc/iptables.flush
+moon::ls -alh /var/
+carol::ls -alh /var/
+moon::cat /var/esp_sa
+carol::cat /var/esp_sa
+moon::cat /var/ikev2_decryption_table
+carol::cat /var/ikev2_decryption_table
