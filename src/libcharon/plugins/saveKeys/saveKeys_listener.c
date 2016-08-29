@@ -105,6 +105,23 @@ static map_algorithm_name_t ike_integrity_algs[] = {
 };
 
 /**
+ * ESP Algorithms for encryption
+ */
+static map_algorithm_name_t esp_encryption_algs[] = {
+	{ENCR_NULL,					-1,					"NULL"},
+	{ENCR_3DES,					-1,					"TripleDes-CBC [RFC2451]"},
+	{ENCR_AES_CBC,				-1,					"AES-CBC [RFC3602]"},
+	{ENCR_AES_CTR,				-1,					"AES-CTR [RFC3686]"},
+	{ENCR_DES,					-1,					"DES-CBC [RFC2405]"},
+	{ENCR_CAST,					-1,					"CAST5-CBC [RFC2144]"},
+	{ENCR_BLOWFISH,				-1,					"BLOWFISH-CBC [RFC2451]"},
+	{ENCR_TWOFISH_CBC,			-1,					"TWOFISH-CBC"},
+	{ENCR_AES_GCM_ICV8,			128,				"AES-GCM [RFC4106]"},
+	{ENCR_AES_GCM_ICV12,		192,				"AES-GCM [RFC4106]"},
+	{ENCR_AES_GCM_ICV16,		256,				"AES-GCM [RFC4106]"},
+};
+
+/**
  * Expands the name of encryption algorithms for IKE decryption table.
  */
 static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
@@ -129,60 +146,16 @@ static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
  */
 static inline char *esp_expand_enc_name(uint16_t enc_alg, int *ICV_length)
 {
-	char *name;
-	switch (enc_alg) {
-		case ENCR_NULL:
-			name = malloc(strlen("NULL") + 1);
-			strcpy(name, "NULL");
-			break;
-		case ENCR_3DES:
-			name = malloc(strlen("TripleDes-CBC [RFC2451]") + 1);
-			strcpy(name, "TripleDes-CBC [RFC2451]");
-			break;
-		case ENCR_AES_CBC:
-			name = malloc(strlen("AES-CBC [RFC3602]") + 1);
-			strcpy(name, "AES-CBC [RFC3602]");
-			break;
-		case ENCR_AES_CTR:
-			name = malloc(strlen("AES-CTR [RFC3686]") + 1);
-			strcpy(name, "AES-CTR [RFC3686]");
-			break; 
-		case ENCR_DES:
-			name = malloc(strlen("DES-CBC [RFC2405]") + 1);
-			strcpy(name, "DES-CBC [RFC2405]");
-			break;
-		case ENCR_CAST:
-			name = malloc(strlen("CAST5-CBC [RFC2144]") + 1);
-			strcpy(name, "CAST5-CBC [RFC2144]");
-			break;
-		case ENCR_BLOWFISH:
-			name = malloc(strlen("BLOWFISH-CBC [RFC2451]") + 1);
-			strcpy(name, "BLOWFISH-CBC [RFC2451]");
-			break;
-		case ENCR_TWOFISH_CBC:
-			name = malloc(strlen("TWOFISH-CBC") + 1);
-			strcpy(name, "TWOFISH-CBC");
-			break;
-		case ENCR_AES_GCM_ICV8:
-			(*ICV_length) = 128;
-			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
-			strcpy(name, "AES-GCM [RFC4106]");
-			break;
-		case ENCR_AES_GCM_ICV12:
-			(*ICV_length) = 192;
-			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
-			strcpy(name, "AES-GCM [RFC4106]");
-			break;
-		case ENCR_AES_GCM_ICV16:
-			(*ICV_length) = 256;
-			name = malloc(strlen("AES-GCM [RFC4106]") + 1);
-			strcpy(name, "AES-GCM [RFC4106]");
-			break;
-		default:
-			name = NULL;
-			break;
-	}
-	return name;
+    unsigned int i;
+    for (i = 0; i < countof(esp_encryption_algs); i ++)
+    {
+        if (esp_encryption_algs[i].strongswan == enc_alg)
+        {
+			(*ICV_length) = esp_encryption_algs[i].size;
+            return esp_encryption_algs[i].name;
+        }
+    }
+    return NULL;
 }
 
 /**
