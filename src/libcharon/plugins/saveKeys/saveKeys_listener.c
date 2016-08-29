@@ -122,6 +122,21 @@ static map_algorithm_name_t esp_encryption_algs[] = {
 };
 
 /**
+ * ESP Algorithms for integrity
+ */
+static map_algorithm_name_t esp_integrity_algs[] = {
+	{AUTH_HMAC_SHA1_96,			-1,					"HMAC-SHA-1-96 [RFC2404]"},
+	{AUTH_HMAC_SHA2_256_96,		-1,					"HMAC-SHA-256-96 [draft-ietf-ipsec-ciph-sha-256-00]"},
+	{AUTH_HMAC_MD5_96,			-1,					"HMAC-MD5-96 [RFC2403]"},
+	{AUTH_HMAC_SHA2_256_128,	-1,					"HMAC-SHA-256-128 [RFC4868]"},
+	{AUTH_HMAC_SHA2_384_192,	-1,					"HMAC-SHA-384-192 [RFC4868]"},
+	{AUTH_HMAC_SHA2_512_256,	-1,					"HMAC-SHA-512-256 [RFC4868]"},
+	{-1,						128,				"ANY 128 bit authentication [no checking]"},
+	{-1,						192,				"ANY 192 bit authentication [no checking]"},
+	{-1,						256,				"ANY 256 bit authentication [no checking]"},
+};
+
+/**
  * Expands the name of encryption algorithms for IKE decryption table.
  */
 static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
@@ -163,62 +178,19 @@ static inline char *esp_expand_enc_name(uint16_t enc_alg, int *ICV_length)
  */
 static inline char *esp_expand_int_name(uint16_t int_alg, int icv_length)
 {
-	char *name;
-	if (icv_length == -1)
-	{
-		switch (int_alg)
+    unsigned int i;
+    for (i = 0; i < countof(esp_integrity_algs); i ++)
+    {
+		if (icv_length != -1 && esp_integrity_algs[i].size == icv_length)
 		{
-			case AUTH_HMAC_SHA1_96:
-				name = malloc(strlen("HMAC-SHA-1-96 [RFC2404]") + 1);
-				strcpy(name, "HMAC-SHA-1-96 [RFC2404]");
-				break;
-			case AUTH_HMAC_SHA2_256_96:
-				name = malloc(strlen("HMAC-SHA-256-96 [draft-ietf-ipsec-ciph-sha-256-00]") + 1);
-				strcpy(name, "HMAC-SHA-256-96 [draft-ietf-ipsec-ciph-sha-256-00]");
-				break;
-			case AUTH_HMAC_MD5_96:
-				name = malloc(strlen("HMAC-MD5-96 [RFC2403]") + 1);
-				strcpy(name, "HMAC-MD5-96 [RFC2403]");
-				break;
-			case AUTH_HMAC_SHA2_256_128:
-				name = malloc(strlen("HMAC-SHA-256-128 [RFC4868]") + 1);
-				strcpy(name, "HMAC-SHA-256-128 [RFC4868]");
-				break;
-			case AUTH_HMAC_SHA2_384_192:
-				name = malloc(strlen("HMAC-SHA-384-192 [RFC4868]") + 1);
-				strcpy(name, "HMAC-SHA-384-192 [RFC4868]");
-				break;
-			case AUTH_HMAC_SHA2_512_256:
-				name = malloc(strlen("HMAC-SHA-512-256 [RFC4868]") + 1);
-				strcpy(name, "HMAC-SHA-512-256 [RFC4868]");
-				break;
-			default:
-				name = NULL;
-				break;
+			return esp_integrity_algs[i].name;
 		}
-	}
-	else
-	{
-		switch (icv_length)
-		{
-			case 128:
-				name = malloc(strlen("ANY 128 bit authentication [no checking]") + 1);
-				strcpy(name, "ANY 128 bit authentication [no checking]");
-				break;
-			case 192:
-				name = malloc(strlen("ANY 192 bit authentication [no checking]") + 1);
-				strcpy(name, "ANY 192 bit authentication [no checking]");
-				break;
-			case 256:
-				name = malloc(strlen("ANY 256 bit authentication [no checking]") + 1);
-				strcpy(name, "ANY 256 bit authentication [no checking]");
-				break;
-			default:
-				name = NULL;
-				break;
-		}
-	}
-	return name;
+        else if (esp_integrity_algs[i].strongswan == int_alg)
+        {
+            return esp_integrity_algs[i].name;
+        }
+    }
+    return NULL;
 }
 
 /**
