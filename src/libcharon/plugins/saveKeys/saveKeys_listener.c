@@ -93,6 +93,18 @@ static map_algorithm_name_t ike_encryption_algs[] = {
 };
 
 /**
+ * IKE Algorithms for integrity
+ */
+static map_algorithm_name_t ike_integrity_algs[] = {
+	{AUTH_HMAC_MD5_96,			-1,					"HMAC_MD5_96 [RFC2403]"},
+	{AUTH_HMAC_SHA1_96,			-1,					"HMAC_SHA1_96 [RFC2404]"},
+	{AUTH_HMAC_SHA2_256_96,		-1,					"HMAC_SHA2_256_96 [draft-ietf-ipsec-ciph-sha-256-00]"},
+	{AUTH_HMAC_SHA2_512_256,	-1,					"HMAC_SHA2_512_256 [RFC4868]"},
+	{AUTH_HMAC_SHA2_384_192,	-1,					"HMAC_SHA2_384_192 [RFC4868]"},
+	{AUTH_HMAC_SHA2_256_128,	-1,					"HMAC_SHA2_256_128 [RFC4868]"},
+};
+
+/**
  * Expands the name of encryption algorithms for IKE decryption table.
  */
 static inline char *expand_enc_name(uint16_t enc_alg, uint16_t size)
@@ -241,47 +253,15 @@ static inline char *esp_expand_int_name(uint16_t int_alg, int icv_length)
  */
 static inline char *expand_int_name(uint16_t int_alg)
 {
-	char *name;
-	enum_name_t *type2 = transform_get_enum_names(INTEGRITY_ALGORITHM);
-	char *short_int_alg = enum_to_name(type2, int_alg);
-	int size_short_name = strlen(short_int_alg);
-	switch (int_alg)
-	{
-		case AUTH_HMAC_MD5_96:
-			name = malloc(size_short_name + strlen(" [RFC2403]")  + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [RFC2403]");
-			break;
-		case AUTH_HMAC_SHA1_96:
-			name = malloc(size_short_name + strlen(" [RFC2404]") + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [RFC2404]");
-			break;
-		case AUTH_HMAC_SHA2_256_96:
-			name = malloc(size_short_name + strlen(" [draft-ietf-ipsec-ciph-sha-256-00]") + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [draft-ietf-ipsec-ciph-sha-256-00]");
-			break;
-		case AUTH_HMAC_SHA2_512_256:
-			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [RFC4868]");
-			break;
-		case AUTH_HMAC_SHA2_384_192:
-			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [RFC4868]");
-			break;
-		case AUTH_HMAC_SHA2_256_128:
-			name = malloc(size_short_name + strlen(" [RFC4868]") + 1);
-			strcpy(name, short_int_alg);
-			strcat(name, " [RFC4868]");
-			break;
-		default :
-			name = NULL;
-			break;
-	}
-	return name;
+    unsigned int i;
+    for (i = 0; i < countof(ike_integrity_algs); i ++)
+    {
+        if (ike_integrity_algs[i].strongswan == int_alg)
+        {
+            return ike_integrity_algs[i].name;
+        }
+    }
+    return NULL;
 }
 
 METHOD(listener_t, send_spis, bool,
