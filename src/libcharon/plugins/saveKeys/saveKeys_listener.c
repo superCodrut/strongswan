@@ -33,7 +33,7 @@ typedef struct map_algorithm_name_t map_algorithm_name_t;
 /**
  * Default path for the directory where the decryption tables will be stored.
  */
-static char *default_path = "/tmp/";
+static char *default_path = NULL;
 
 /**
  * Private data of an saveKeys_listener_t object.
@@ -230,6 +230,9 @@ METHOD(listener_t, save_child_keys, bool,
 	char *buffer_encr_out = NULL, *buffer_encr_in = NULL, *buffer_integ_in = NULL;
 	char *buffer_integ_out = NULL, *name_enc_alg = NULL, *name_int_alg = NULL;
 	FILE *esp_file;
+
+	if (this->directory_path)
+	{
 	char *path_esp = malloc (strlen(this->directory_path) + strlen("esp_sa") + 1);
 	strcpy(path_esp, this->directory_path);
 	strcat(path_esp, "esp_sa");
@@ -274,6 +277,7 @@ METHOD(listener_t, save_child_keys, bool,
 	fclose(esp_file);
 	free(path_esp);
 	free(this->directory_path);
+	}
 	return TRUE;
 }
 
@@ -290,6 +294,8 @@ METHOD(listener_t, save_ike_keys, bool,
 	chunk_t chunk_sk_ei = chunk_empty, chunk_sk_er = chunk_empty;
 	chunk_t chunk_sk_ar = chunk_empty, chunk_sk_ai = chunk_empty;
 
+	if (this->directory_path)
+	{
 	char *path_ikev2 = malloc (strlen(this->directory_path) + strlen("ikev2_decryption_table") + 1);
 	char *path_ikev1 = malloc (strlen(this->directory_path) + strlen("ikev1_decryption_table") + 1);
 	strcpy(path_ikev2, this->directory_path);
@@ -342,6 +348,7 @@ METHOD(listener_t, save_ike_keys, bool,
 	chunk_clear(&this->spi_r);
 	free(path_ikev2);
 	free(path_ikev1);
+	}
 
         return TRUE;
 }
