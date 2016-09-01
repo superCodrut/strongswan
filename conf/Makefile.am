@@ -93,6 +93,7 @@ plugins = \
 	plugins/vici.opt \
 	plugins/whitelist.opt \
 	plugins/xauth-eap.opt \
+	plugins/saveKeys.conf \
 	plugins/xauth-pam.opt
 
 alloptions = $(options) $(plugins)
