@@ -21,12 +21,12 @@
  */
 
 
-#include "saveKeys_listener.h"
+#include "save_keys_listener.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct private_saveKeys_listener_t private_saveKeys_listener_t;
+typedef struct private_save_keys_listener_t private_save_keys_listener_t;
 
 typedef struct map_algorithm_name_t map_algorithm_name_t;
 
@@ -36,14 +36,14 @@ typedef struct map_algorithm_name_t map_algorithm_name_t;
 static char *default_path = NULL;
 
 /**
- * Private data of an saveKeys_listener_t object.
+ * Private data of an save_keys_listener_t object.
  */
-struct private_saveKeys_listener_t {
+struct private_save_keys_listener_t {
 
 	/**
-	 * Public saveKeys_listener_t interface.
+	 * Public save_keys_listener_t interface.
 	 */
-	saveKeys_listener_t public;
+	save_keys_listener_t public;
 
 	/**
 	 * SPI_i for IKEv2.
@@ -210,7 +210,7 @@ static inline char *expand_int_name(uint16_t int_alg)
 }
 
 METHOD(listener_t, send_spis, bool,
-	private_saveKeys_listener_t *this, chunk_t spi_i, chunk_t spi_r)
+	private_save_keys_listener_t *this, chunk_t spi_i, chunk_t spi_r)
 {
 	this->spi_i = chunk_clone(spi_i);
 	this->spi_r = chunk_clone(spi_r);
@@ -218,7 +218,7 @@ METHOD(listener_t, send_spis, bool,
 }
 
 METHOD(listener_t, save_child_keys, bool,
-	private_saveKeys_listener_t *this, uint16_t enc_alg,
+	private_save_keys_listener_t *this, uint16_t enc_alg,
 	uint16_t int_alg, host_t *init_ip, host_t *resp_ip,
 	uint32_t spi_out, chunk_t encr_key_out,
 	chunk_t int_key_out, uint32_t spi_in, chunk_t encr_key_in,
@@ -270,7 +270,7 @@ METHOD(listener_t, save_child_keys, bool,
 }
 
 METHOD(listener_t, save_ike_keys, bool,
-        private_saveKeys_listener_t *this, ike_version_t ike_version,
+        private_save_keys_listener_t *this, ike_version_t ike_version,
 	chunk_t sk_ei, chunk_t sk_er, chunk_t sk_ai, chunk_t sk_ar, uint16_t enc_alg,
 	uint16_t key_size, uint16_t int_alg)
 {
@@ -323,9 +323,9 @@ METHOD(listener_t, save_ike_keys, bool,
 /**
  * See header.
  */
-saveKeys_listener_t *saveKeys_listener_create()
+save_keys_listener_t *save_keys_listener_create()
 {
-	private_saveKeys_listener_t *this;
+	private_save_keys_listener_t *this;
 
 	INIT(this,
 		.public = {
@@ -338,6 +338,6 @@ saveKeys_listener_t *saveKeys_listener_create()
 	);
 
 	this->directory_path = lib->settings->get_str(lib->settings,
-							"%s.plugins.saveKeys.directory_path", default_path, lib->ns);
+							"%s.plugins.save-keys.directory_path", default_path, lib->ns);
 	return &this->public;
 }

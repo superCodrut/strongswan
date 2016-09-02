@@ -199,9 +199,9 @@ endif
 endif
 
 if USE_SAVE_KEYS
- SUBDIRS += plugins/saveKeys
+ SUBDIRS += plugins/save_keys
 if MONOLITHIC
- libcharon_la_LIBADD += plugins/saveKeys/libstrongswan-saveKeys.la
+ libcharon_la_LIBADD += plugins/save_keys/libstrongswan-save-keys.la
 endif
 endif
 

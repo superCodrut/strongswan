@@ -21,40 +21,40 @@
  */
 
 
-#include "saveKeys_listener.h"
+#include "save_keys_listener.h"
 
-#include "saveKeys_plugin.h"
+#include "save_keys_plugin.h"
 
 #include <daemon.h>
 
-typedef struct private_saveKeys_plugin_t private_saveKeys_plugin_t;
+typedef struct private_save_keys_plugin_t private_save_keys_plugin_t;
 
 /**
- * Private data of saveKeys plugin.
+ * Private data of save_keys plugin.
  */
-struct private_saveKeys_plugin_t {
+struct private_save_keys_plugin_t {
 
 	/**
 	 * Implements plugin interface.
 	 */
-	saveKeys_plugin_t public;
+	save_keys_plugin_t public;
 
 	/**
 	 * Listener saving keys to file.
 	 */
-	saveKeys_listener_t *listener;
+	save_keys_listener_t *listener;
 };
 
 METHOD(plugin_t, get_name, char*,
-	private_saveKeys_plugin_t *this)
+	private_save_keys_plugin_t *this)
 {
-	return "saveKeys";
+	return "save-keys";
 }
 
 /**
  * Register listener.
  */
-static bool plugin_cb(private_saveKeys_plugin_t *this,
+static bool plugin_cb(private_save_keys_plugin_t *this,
 					plugin_feature_t *feature, bool reg, void *cb_data)
 {
 	if (reg)
@@ -69,11 +69,11 @@ static bool plugin_cb(private_saveKeys_plugin_t *this,
 }
 
 METHOD(plugin_t, get_features, int,
-	private_saveKeys_plugin_t *this, plugin_feature_t *features[])
+	private_save_keys_plugin_t *this, plugin_feature_t *features[])
 {
 	static plugin_feature_t f[] = {
 		PLUGIN_CALLBACK((plugin_feature_callback_t)plugin_cb, NULL),
-			PLUGIN_PROVIDE(CUSTOM, "saveKeys"),
+			PLUGIN_PROVIDE(CUSTOM, "save-keys"),
 	};
 	*features = f;
 	return countof(f);
@@ -82,9 +82,9 @@ METHOD(plugin_t, get_features, int,
 /**
  * Plugin constructor.
  */
-plugin_t *saveKeys_plugin_create()
+plugin_t *save_keys_plugin_create()
 {
-	private_saveKeys_plugin_t *this;
+	private_save_keys_plugin_t *this;
 
 	INIT(this,
 		.public = {
@@ -93,7 +93,7 @@ plugin_t *saveKeys_plugin_create()
 				.get_features = _get_features,
 			},
 		},
-		.listener = saveKeys_listener_create(),
+		.listener = save_keys_listener_create(),
 	);
 
 	return &this->public.plugin;

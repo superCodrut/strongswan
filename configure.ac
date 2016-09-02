@@ -200,7 +200,7 @@ ARG_ENABL_SET([keychain],       [enables OS X Keychain Services credential set.]
 ARG_ENABL_SET([pkcs11],         [enables the PKCS11 token support plugin.])
 ARG_DISBL_SET([revocation],     [disable X509 CRL/OCSP revocation check plugin.])
 ARG_ENABL_SET([whitelist],      [enable peer identity whitelisting plugin.])
-ARG_ENABL_SET([saveKeys],	[enable saveKeys plugin])
+ARG_ENABL_SET([save-keys],	[enable save-keys plugin])
 ARG_DISBL_SET([xauth-generic],  [disable generic XAuth backend.])
 ARG_ENABL_SET([xauth-eap],      [enable XAuth backend using EAP methods to verify passwords.])
 ARG_ENABL_SET([xauth-pam],      [enable XAuth backend using PAM to verify passwords.])
@@ -1376,7 +1376,7 @@ ADD_PLUGIN([kernel-pfkey],         [c charon starter nm cmd])
 ADD_PLUGIN([kernel-pfroute],       [c charon starter nm cmd])
 ADD_PLUGIN([kernel-netlink],       [c charon starter nm cmd])
 ADD_PLUGIN([resolve],              [c charon cmd])
-ADD_PLUGIN([saveKeys],             [c charon])
+ADD_PLUGIN([save-keys],            [c charon])
 ADD_PLUGIN([socket-default],       [c charon nm cmd])
 ADD_PLUGIN([socket-dynamic],       [c charon cmd])
 ADD_PLUGIN([socket-win],           [c charon])
@@ -1515,7 +1515,7 @@ AM_CONDITIONAL(USE_CHAPOLY, test x$chapoly = xtrue)
 AM_CONDITIONAL(USE_CTR, test x$ctr = xtrue)
 AM_CONDITIONAL(USE_CCM, test x$ccm = xtrue)
 AM_CONDITIONAL(USE_GCM, test x$gcm = xtrue)
-AM_CONDITIONAL(USE_SAVE_KEYS, test x$saveKeys = xtrue)
+AM_CONDITIONAL(USE_SAVE_KEYS, test x$save_keys = xtrue)
 AM_CONDITIONAL(USE_AF_ALG, test x$af_alg = xtrue)
 AM_CONDITIONAL(USE_NTRU, test x$ntru = xtrue)
 AM_CONDITIONAL(USE_BLISS, test x$bliss = xtrue)
@@ -1867,7 +1867,7 @@ AC_CONFIG_FILES([
 	src/libcharon/plugins/error_notify/Makefile
 	src/libcharon/plugins/certexpire/Makefile
 	src/libcharon/plugins/systime_fix/Makefile
-	src/libcharon/plugins/saveKeys/Makefile
+	src/libcharon/plugins/save_keys/Makefile
 	src/libcharon/plugins/led/Makefile
 	src/libcharon/plugins/duplicheck/Makefile
 	src/libcharon/plugins/coupling/Makefile

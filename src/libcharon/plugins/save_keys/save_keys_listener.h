@@ -21,22 +21,28 @@
  */
 
 
-#ifndef saveKeys_PLUGIN_H
-#define saveKeys_PLUGIN_H
+#ifndef save_keys_LISTENER_H
+#define save_keys_LISTENER_H
 
-#include <plugins/plugin.h>
+#include <bus/listeners/listener.h>
+#include <ctype.h>
 
-typedef struct saveKeys_plugin_t saveKeys_plugin_t;
+typedef struct save_keys_listener_t save_keys_listener_t;
 
 /**
- * External authorization by script plugin.
+ * Listener checking connecting peer against a whitelist.
  */
-struct saveKeys_plugin_t {
+struct save_keys_listener_t {
 
 	/**
-	 * Implements plugin interface.
+	 * Implements listener_t interface.
 	 */
-	plugin_t plugin;
+	listener_t listener;
 };
+
+/**
+ * Create a save_keys_listener_t instance.
+ */
+save_keys_listener_t *save_keys_listener_create();
 
 #endif
