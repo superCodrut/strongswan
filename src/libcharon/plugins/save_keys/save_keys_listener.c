@@ -344,7 +344,6 @@ METHOD(listener_t, save_child_keys, bool,
 			free(name_enc_alg);
 			fclose(esp_file);
 			free(path_esp);
-			free(this->directory_path);
 		}
 	}
 	return TRUE;
@@ -366,9 +365,9 @@ save_keys_listener_t *save_keys_listener_create()
 			},
 		}
 	);
-
 	this->directory_path = lib->settings->get_str(lib->settings,
 							"%s.plugins.save-keys.directory_path",
 								default_path, lib->ns);
+
 	return &this->public;
 }
